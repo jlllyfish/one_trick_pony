@@ -131,7 +131,10 @@ if data is not None:
         if selected_group in existing_group_emails and existing_group_emails[selected_group]:
             st.subheader(f"Emails existants pour le groupe '{selected_group}'")
             existing_emails_str = "\n".join(existing_group_emails[selected_group])
-            st.code(existing_emails_str)
+            st.text_area("Emails existants", 
+                         value=existing_emails_str, 
+                         height=150, 
+                         disabled=True)
         else:
             st.info(f"Aucun email existant pour le groupe '{selected_group}'")
         
@@ -182,7 +185,12 @@ if data is not None:
         for group, emails in all_groups_emails.items():
             if emails:
                 with st.expander(f"Groupe: {group} ({len(emails)} emails)"):
-                    st.code("\n".join(emails))
+                    # Afficher les emails de manière uniforme
+                    email_list_display = "\n".join(emails)
+                    st.text_area(f"Emails du groupe {group}", 
+                                 value=email_list_display, 
+                                 height=150, 
+                                 disabled=True)
                     
                     # Bouton pour supprimer les emails de ce groupe
                     if st.button(f"Supprimer les emails ajoutés pour le groupe '{group}'", key=f"del_{group}"):
