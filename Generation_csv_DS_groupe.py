@@ -167,7 +167,7 @@ if data is not None:
     else:
         st.info("Aucun email spécifique n'a été ajouté pour le moment.")
 else:
-    st.info("Veuillez importer le fichier CSV Démarches Simplifiées (groupe instructeur : "Exporter le csv" pour gérer les emails spécifiques aux groupes.")
+    st.info("Veuillez importer le fichier CSV Démarches Simplifiées (groupe instructeur : (Exporter le csv) pour gérer les emails spécifiques aux groupes.")
 
 # Séparateur visuel
 st.markdown("---")
