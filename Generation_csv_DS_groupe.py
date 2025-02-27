@@ -26,7 +26,7 @@ st.title("Gestion des groupes d'instructeurs")
 st.sidebar.header("Importation du fichier")
 
 # Upload du fichier CSV
-uploaded_file = st.sidebar.file_uploader("Importer le fichier CSV", type=['csv'])
+uploaded_file = st.sidebar.file_uploader("Importer le fichier CSV Démarches simpliées (groupe instructeur)", type=['csv'])
 
 # Section principale - Emails récurrents
 st.header("1. Emails récurrents (pour tous les groupes)")
