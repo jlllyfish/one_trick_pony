@@ -260,7 +260,7 @@ if st.button("Générer le fichier CSV"):
             
             # Lien de téléchargement
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"groupe_instructeurs_onetrickpony_{now}.csv"
+            filename = f"groupe_instructeurs_{now}.csv"
             st.markdown(get_csv_download_link(expanded_df, filename), unsafe_allow_html=True)
             
         except Exception as e:
