@@ -214,28 +214,42 @@ if st.button("Générer le fichier CSV"):
             # Création d'une nouvelle structure avec les e-mails ajoutés
             expanded_data = []
             
+            # Récupérer tous les groupes
+            all_groups = set(processed_data['Groupe'].unique())
+            
             # Ajouter les emails récurrents à tous les groupes
-            for _, row in processed_data.iterrows():
+            for group in all_groups:
+                # Emails récurrents
                 for email in recurring_emails_list:
-                    if email not in existing_group_emails.get(row['Groupe'], []):
+                    if email not in existing_group_emails.get(group, []):
                         expanded_data.append({
-                            'Groupe': row['Groupe'],
+                            'Groupe': group,
                             'Email': email
                         })
-            
-            # Ajouter les emails spécifiques à leurs groupes respectifs
-            if 'specific_emails' in st.session_state:
-                for group, emails in st.session_state.specific_emails.items():
-                    # Vérifier si le groupe existe encore après le filtrage
-                    if group in processed_data['Groupe'].values:
-                        for email in emails:
+                
+                # Emails spécifiques ajoutés
+                if 'specific_emails' in st.session_state and group in st.session_state.specific_emails:
+                    for email in st.session_state.specific_emails[group]:
+                        if email not in existing_group_emails.get(group, []):
                             expanded_data.append({
                                 'Groupe': group,
                                 'Email': email
                             })
             
+            # Ajouter les emails existants
+            for group, emails in existing_group_emails.items():
+                for email in emails:
+                    if email not in [row['Email'] for row in expanded_data if row['Groupe'] == group]:
+                        expanded_data.append({
+                            'Groupe': group,
+                            'Email': email
+                        })
+            
             # Conversion en DataFrame
             expanded_df = pd.DataFrame(expanded_data)
+            
+            # Trier par groupe et email
+            expanded_df = expanded_df.sort_values(['Groupe', 'Email'])
             
             # Afficher un aperçu du fichier final
             st.subheader("Aperçu du fichier final")
