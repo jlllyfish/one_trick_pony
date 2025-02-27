@@ -74,6 +74,7 @@ st.header("2. Groupes et emails spécifiques")
 
 # Variable pour stocker les données du fichier
 data = None
+existing_group_emails = {}
 
 # Traitement du fichier téléversé
 if uploaded_file is not None:
@@ -89,17 +90,20 @@ if uploaded_file is not None:
                     uploaded_file.seek(0)  # Réinitialiser le curseur à chaque tentative
                     test_data = pd.read_csv(uploaded_file, encoding=encoding, sep=separator)
                     
-                    if 'Groupe' in test_data.columns:
+                    if 'Groupe' in test_data.columns and 'Email' in test_data.columns:
                         data = test_data
                         st.sidebar.success(f"Fichier chargé avec succès (encodage: {encoding}, séparateur: '{separator}')")
+                        
+                        # Extraire les emails existants par groupe
+                        existing_group_emails = data.groupby('Groupe')['Email'].apply(list).to_dict()
                         break
                 except Exception:
                     continue
-            if data is not None and 'Groupe' in data.columns:
+            if data is not None and 'Groupe' in data.columns and 'Email' in data.columns:
                 break
         
-        if data is None or 'Groupe' not in data.columns:
-            st.error("Impossible de lire le fichier. Veuillez vérifier son format (il doit avoir une colonne 'Groupe').")
+        if data is None or 'Groupe' not in data.columns or 'Email' not in data.columns:
+            st.error("Impossible de lire le fichier. Veuillez vérifier son format (il doit avoir des colonnes 'Groupe' et 'Email').")
             data = None
             
     except Exception as e:
@@ -123,8 +127,16 @@ if data is not None:
                                   options=unique_groups if unique_groups else [""])
     
     if selected_group:
+        # Afficher les emails existants pour le groupe sélectionné
+        if selected_group in existing_group_emails and existing_group_emails[selected_group]:
+            st.subheader(f"Emails existants pour le groupe '{selected_group}'")
+            existing_emails_str = "\n".join(existing_group_emails[selected_group])
+            st.code(existing_emails_str)
+        else:
+            st.info(f"Aucun email existant pour le groupe '{selected_group}'")
+        
         group_emails = st.text_area(
-            f"Emails spécifiques pour le groupe '{selected_group}' (un par ligne)",
+            f"Emails spécifiques à ajouter pour le groupe '{selected_group}' (un par ligne)",
             value="",
             height=150,
             placeholder="exemple@agriculture.gouv.fr\nautre.email@agriculture.gouv.fr"
@@ -143,7 +155,10 @@ if data is not None:
         # Bouton pour ajouter les emails au groupe
         if st.button("Ajouter ces emails au groupe"):
             if emails_valid and emails_list:
-                st.session_state.specific_emails[selected_group] = emails_list
+                # Combiner les emails existants avec les nouveaux emails
+                existing_emails = existing_group_emails.get(selected_group, [])
+                new_unique_emails = list(set(existing_emails + emails_list))
+                st.session_state.specific_emails[selected_group] = new_unique_emails
                 st.success(f"{len(emails_list)} email(s) ajouté(s) au groupe '{selected_group}'")
             elif not emails_valid:
                 st.error("Veuillez corriger les emails invalides avant d'ajouter.")
@@ -154,16 +169,26 @@ if data is not None:
         st.info("💡 Astuce : Utilisez Ctrl+Enter pour valider votre saisie dans ce champ.")
     
     # Afficher les emails spécifiques ajoutés
-    st.subheader("Emails spécifiques ajoutés aux groupes")
-    if 'specific_emails' in st.session_state and st.session_state.specific_emails:
-        for group, emails in st.session_state.specific_emails.items():
-            with st.expander(f"Groupe: {group} ({len(emails)} emails)"):
-                st.write("\n".join(emails))
-                
-                # Bouton pour supprimer les emails de ce groupe
-                if st.button(f"Supprimer les emails du groupe '{group}'", key=f"del_{group}"):
-                    del st.session_state.specific_emails[group]
-                    st.rerun()
+    st.subheader("Emails ajoutés aux groupes")
+    all_groups_emails = {}
+    
+    # Combiner les emails existants et les emails nouvellement ajoutés
+    for group in unique_groups:
+        existing_emails = existing_group_emails.get(group, [])
+        specific_emails = st.session_state.specific_emails.get(group, [])
+        all_groups_emails[group] = list(set(existing_emails + specific_emails))
+    
+    if all_groups_emails:
+        for group, emails in all_groups_emails.items():
+            if emails:
+                with st.expander(f"Groupe: {group} ({len(emails)} emails)"):
+                    st.code("\n".join(emails))
+                    
+                    # Bouton pour supprimer les emails de ce groupe
+                    if st.button(f"Supprimer les emails ajoutés pour le groupe '{group}'", key=f"del_{group}"):
+                        if group in st.session_state.specific_emails:
+                            del st.session_state.specific_emails[group]
+                        st.rerun()
     else:
         st.info("Aucun email spécifique n'a été ajouté pour le moment.")
 else:
@@ -193,10 +218,11 @@ if st.button("Générer le fichier CSV"):
             # Ajouter les emails récurrents à tous les groupes
             for _, row in processed_data.iterrows():
                 for email in recurring_emails_list:
-                    expanded_data.append({
-                        'Groupe': row['Groupe'],
-                        'Email': email
-                    })
+                    if email not in existing_group_emails.get(row['Groupe'], []):
+                        expanded_data.append({
+                            'Groupe': row['Groupe'],
+                            'Email': email
+                        })
             
             # Ajouter les emails spécifiques à leurs groupes respectifs
             if 'specific_emails' in st.session_state:
