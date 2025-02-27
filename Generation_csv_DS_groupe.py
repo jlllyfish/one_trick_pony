@@ -127,55 +127,54 @@ if data is not None:
                                   options=unique_groups if unique_groups else [""])
     
     if selected_group:
-        # Afficher les emails existants pour le groupe sélectionné
-        if selected_group in existing_group_emails and existing_group_emails[selected_group]:
-            st.subheader(f"Emails existants pour le groupe '{selected_group}'")
-            existing_emails_str = "\n".join(existing_group_emails[selected_group])
-            st.text_area("Emails existants", 
-                         value=existing_emails_str, 
-                         height=150, 
-                         disabled=True)
-        else:
-            st.info(f"Aucun email existant pour le groupe '{selected_group}'")
+        # Gestion des emails existants et ajoutés pour le groupe
+        existing_emails = existing_group_emails.get(selected_group, [])
+        added_emails = st.session_state.specific_emails.get(selected_group, [])
         
-        group_emails = st.text_area(
-            f"Emails spécifiques à ajouter pour le groupe '{selected_group}' (un par ligne)",
-            value="",
-            height=150,
-            placeholder="exemple@agriculture.gouv.fr\nautre.email@agriculture.gouv.fr"
-        )
+        # Combiner les emails existants et ajoutés
+        all_emails = existing_emails + added_emails
         
-        # Valider les emails
-        emails_list = [email.strip() for email in group_emails.split("\n") if email.strip()]
-        invalid_emails = [email for email in emails_list if not is_valid_email(email)]
+        # Section pour afficher les emails du groupe
+        st.subheader(f"Emails pour le groupe '{selected_group}'")
         
-        if invalid_emails:
-            st.error(f"Les emails suivants ne sont pas valides : {', '.join(invalid_emails)}")
-            emails_valid = False
-        else:
-            emails_valid = True
-        
-        # Bouton pour ajouter les emails au groupe
-        if st.button("Ajouter ces emails au groupe"):
-            if emails_valid and emails_list:
-                # Combiner les emails existants avec les nouveaux emails
-                existing_emails = existing_group_emails.get(selected_group, [])
-                new_unique_emails = list(set(existing_emails + emails_list))
-                st.session_state.specific_emails[selected_group] = new_unique_emails
-                st.success(f"{len(emails_list)} email(s) ajouté(s) au groupe '{selected_group}'")
-            elif not emails_valid:
-                st.error("Veuillez corriger les emails invalides avant d'ajouter.")
-            else:
-                st.warning("Aucun email valide à ajouter.")
+        # Créer un formulaire pour gérer les emails
+        with st.form(key=f'email_form_{selected_group}'):
+            # Zone de texte modifiable avec tous les emails
+            email_text = st.text_area(
+                "Emails (un par ligne)", 
+                value="\n".join(all_emails), 
+                height=200
+            )
+            
+            # Bouton de soumission
+            submit_button = st.form_submit_button("Mettre à jour les emails")
+            
+            if submit_button:
+                # Nettoyer et valider les emails
+                updated_emails = [email.strip() for email in email_text.split('\n') if email.strip()]
+                
+                # Vérifier la validité des emails
+                invalid_emails = [email for email in updated_emails if not is_valid_email(email)]
+                
+                if invalid_emails:
+                    st.error(f"Les emails suivants ne sont pas valides : {', '.join(invalid_emails)}")
+                else:
+                    # Séparer les emails existants et ajoutés
+                    new_added_emails = [email for email in updated_emails if email not in existing_emails]
+                    
+                    # Mettre à jour les emails spécifiques
+                    st.session_state.specific_emails[selected_group] = new_added_emails
+                    
+                    st.success(f"Emails du groupe '{selected_group}' mis à jour.")
         
         # Ajouter un bloc d'aide sur l'utilisation de Ctrl+Enter
-        st.info("💡 Astuce : Utilisez Ctrl+Enter pour valider votre saisie dans ce champ.")
+        st.info("💡 Astuce : Utilisez Ctrl+Enter pour valider votre saisie.")
     
-    # Afficher les emails spécifiques ajoutés
-    st.subheader("Emails ajoutés aux groupes")
+    # Section récapitulative des emails par groupe
+    st.subheader("Récapitulatif des emails par groupe")
+    
+    # Préparer un dictionnaire combinant emails existants et ajoutés
     all_groups_emails = {}
-    
-    # Combiner les emails existants et les emails nouvellement ajoutés
     for group in unique_groups:
         existing_emails = existing_group_emails.get(group, [])
         specific_emails = st.session_state.specific_emails.get(group, [])
@@ -185,18 +184,10 @@ if data is not None:
         for group, emails in all_groups_emails.items():
             if emails:
                 with st.expander(f"Groupe: {group} ({len(emails)} emails)"):
-                    # Afficher les emails de manière uniforme
-                    email_list_display = "\n".join(emails)
                     st.text_area(f"Emails du groupe {group}", 
-                                 value=email_list_display, 
+                                 value="\n".join(emails), 
                                  height=150, 
-                                 disabled=True)
-                    
-                    # Bouton pour supprimer les emails de ce groupe
-                    if st.button(f"Supprimer les emails ajoutés pour le groupe '{group}'", key=f"del_{group}"):
-                        if group in st.session_state.specific_emails:
-                            del st.session_state.specific_emails[group]
-                        st.rerun()
+                                 key=f"group_emails_{group}")
     else:
         st.info("Aucun email spécifique n'a été ajouté pour le moment.")
 else:
