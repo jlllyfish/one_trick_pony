@@ -9,7 +9,7 @@ Cette application Streamlit permet de gérer et de consolider les emails pour di
 ### 1. Emails Récurrents
 - Ajoutez des emails qui seront communs à tous les groupes
 - Validation en temps réel des adresses email
-- Affichage du nombre total d'emails récurrents valides
+- Affichage du nombre total d'emails existant et ajoutés par groupe
 
 ### 2. Groupes et Emails Spécifiques
 - Importez un fichier CSV contenant les informations des groupes
