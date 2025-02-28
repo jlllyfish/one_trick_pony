@@ -41,7 +41,7 @@ def update_specific_emails_count():
 st.sidebar.header("Importation du fichier")
 
 # Upload du fichier CSV
-uploaded_file = st.sidebar.file_uploader("Importer le fichier CSV Démarches simplifiées (gestion des groupes instructeur)", type=['csv'])
+uploaded_file = st.sidebar.file_uploader("Importer le fichier CSV Démarches simplifiées (gestion des groupes instructeurs)", type=['csv'])
 
 # Compteur d'emails spécifiques déplacé vers la section principale
 
