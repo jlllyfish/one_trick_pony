@@ -3,6 +3,7 @@
 ## 🚀 Description de l'Application
 
 Cette application Streamlit permet de gérer et de consolider les emails pour différents groupes d'instructeurs à partir d'un fichier CSV exporté de Démarches Simplifiées.
+Pour lancer l'appli en local : streamlit one_trick_pony.py
 
 ## 📋 Fonctionnalités Principales
 
