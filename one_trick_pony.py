@@ -7,7 +7,7 @@ from datetime import datetime
 st.set_page_config(page_title="One trick pony", page_icon="🐴", layout="wide")
 
 # Ajouter le nom de l'application au-dessus du titre principal
-st.markdown("<h1 style='text-align: center; color: #000091;'>One trick pony</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>One trick pony</h1>", unsafe_allow_html=True)
 
 # Titre fonctionnel en h2
 st.markdown("<h2>Gestion des groupes d'instructeurs</h2>", unsafe_allow_html=True)
