@@ -4,7 +4,13 @@ import base64
 import re
 from datetime import datetime
 
-st.set_page_config(page_title="Gestion des groupes d'instructeurs", layout="wide")
+st.set_page_config(page_title="One trick pony", page_icon="🐴", layout="wide")
+
+# Ajouter le nom de l'application au-dessus du titre principal
+st.markdown("<h1 style='text-align: center; color: #000091;'>One trick pony</h1>", unsafe_allow_html=True)
+
+# Titre fonctionnel en h2
+st.markdown("<h2>Gestion des groupes d'instructeurs</h2>", unsafe_allow_html=True)
 
 # Fonction pour télécharger le fichier CSV
 def get_csv_download_link(df, filename):
@@ -18,9 +24,6 @@ def is_valid_email(email):
     # Regex pour validation d'email
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
-
-# Titre de l'application
-st.title("Gestion des groupes d'instructeurs")
 
 # Initialiser le dictionnaire pour stocker les emails spécifiques si nécessaire
 if 'specific_emails' not in st.session_state:
@@ -37,16 +40,16 @@ def update_specific_emails_count():
         count += len(emails)
     st.session_state.specific_emails_count = count
 
-# Sidebar pour l'importation du fichier
-st.sidebar.header("Importation du fichier")
+# Sidebar pour l'importation du fichier (h3 pour harmoniser)
+st.sidebar.markdown("### Importation du fichier")
 
 # Upload du fichier CSV
-uploaded_file = st.sidebar.file_uploader("Importer le fichier CSV Démarches simplifiées (gestion des groupes instructeurs)", type=['csv'])
+uploaded_file = st.sidebar.file_uploader("Importer le fichier CSV Démarches simplifiées (groupe instructeur)", type=['csv'])
 
 # Compteur d'emails spécifiques déplacé vers la section principale
 
-# Section principale - Emails récurrents
-st.header("1. Emails récurrents (pour tous les groupes)")
+# Section principale - Emails récurrents (h3)
+st.markdown("### 1. Emails récurrents (pour tous les groupes)")
 
 # Initialiser la zone de texte pour les emails récurrents si elle n'existe pas
 if 'recurring_emails_text' not in st.session_state:
@@ -86,8 +89,8 @@ st.info("💡 Astuce : Utilisez Ctrl+Enter pour valider votre saisie dans ce cha
 # Séparateur visuel
 st.markdown("---")
 
-# Section - Groupes et emails spécifiques
-st.header("2. Groupes et emails spécifiques")
+# Section - Groupes et emails spécifiques (h3)
+st.markdown("### 2. Groupes et emails spécifiques")
 
 # Variable pour stocker les données du fichier
 data = None
@@ -156,8 +159,8 @@ if data is not None:
         # Combiner les emails existants et ajoutés
         all_emails = existing_emails + added_emails
         
-        # Section pour afficher les emails du groupe
-        st.subheader(f"Emails pour le groupe '{selected_group}'")
+        # Section pour afficher les emails du groupe (h4)
+        st.markdown(f"#### Emails pour le groupe '{selected_group}'")
         
         # Créer un formulaire pour gérer les emails
         with st.form(key=f'email_form_{selected_group}'):
@@ -197,8 +200,8 @@ if data is not None:
         # Ajouter un bloc d'aide sur l'utilisation de Ctrl+Enter
         st.info("💡 Astuce : Utilisez Ctrl+Enter pour valider votre saisie.")
     
-    # Section récapitulative des emails par groupe
-    st.subheader("Récapitulatif des emails par groupe")
+    # Section récapitulative des emails par groupe (h4)
+    st.markdown("#### Récapitulatif des emails par groupe")
     
     # Préparer un dictionnaire combinant emails existants et ajoutés
     all_groups_emails = {}
@@ -231,13 +234,13 @@ if data is not None:
     else:
         st.info("Aucun email spécifique n'a été ajouté pour le moment.")
 else:
-    st.info("Veuillez importer le fichier CSV Démarches Simplifiées (groupe instructeur : Exporter le csv) pour gérer les emails spécifiques aux groupes.")
+    st.info("Veuillez importer le fichier CSV Démarches Simplifiées (Gestion des groupes instructeurs : Exporter le csv) pour gérer les emails spécifiques aux groupes.")
 
 # Séparateur visuel
 st.markdown("---")
 
-# Bouton pour générer le fichier final
-st.header("3. Génération du fichier final")
+# Bouton pour générer le fichier final (h3)
+st.markdown("### 3. Génération du fichier final")
 
 if st.button("Générer le fichier CSV"):
     if uploaded_file is None:
@@ -291,8 +294,8 @@ if st.button("Générer le fichier CSV"):
             # Trier par groupe et email
             expanded_df = expanded_df.sort_values(['Groupe', 'Email'])
             
-            # Afficher un aperçu du fichier final
-            st.subheader("Aperçu du fichier final")
+            # Afficher un aperçu du fichier final (h4)
+            st.markdown("#### Aperçu du fichier final")
             st.write(f"Nombre total d'entrées: {len(expanded_df)}")
             
             # Afficher le DataFrame avec une hauteur plus importante
