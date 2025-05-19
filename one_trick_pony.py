@@ -6,8 +6,40 @@ from datetime import datetime
 
 st.set_page_config(page_title="One trick pony", page_icon="🐴", layout="wide")
 
+# Ajouter le style CSS pour le pied de page
+st.markdown("""
+<style>
+/* Style pour le pied de page */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f5f5f5;
+    color: #666666;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    border-top: 1px solid #e0e0e0;
+    z-index: 999;
+}
+
+.footer img {
+    height: 22px;
+    vertical-align: middle;
+    margin: 0 4px;
+}
+
+.cc-icon {
+    height: 22px;
+    vertical-align: middle;
+    margin: 0 4px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Ajouter le nom de l'application au-dessus du titre principal
-st.markdown("<h1 style='text-align: center;'>One trick pony</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🐴 One trick pony</h1>", unsafe_allow_html=True)
 
 # Titre fonctionnel en h2
 st.markdown("<h2>Gestion des groupes d'instructeurs</h2>", unsafe_allow_html=True)
@@ -308,3 +340,13 @@ if st.button("Générer le fichier CSV"):
             
         except Exception as e:
             st.error(f"Erreur lors de la génération du fichier: {e}")
+
+# Pied de page avec copyright
+st.markdown("""
+<div class="footer">
+    © 2025 Creative Commons Attribution (CC BY) 
+    <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" class="cc-icon" alt="CC">
+    <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" class="cc-icon" alt="BY">
+    DRAAF Occitanie - Tous droits réservés
+</div>
+""", unsafe_allow_html=True)
